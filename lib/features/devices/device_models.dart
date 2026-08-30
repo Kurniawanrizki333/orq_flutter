@@ -17,8 +17,8 @@ abstract class Capability with _$Capability {
     required String type,
     /// One of: read, write, read_write.
     required String mode,
-    num? min,
-    num? max,
+    @JsonKey(name: 'min_value') num? min,
+    @JsonKey(name: 'max_value') num? max,
     String? unit,
   }) = _Capability;
 
@@ -31,9 +31,14 @@ abstract class Device with _$Device {
     required String id,
     required String name,
     @JsonKey(name: 'product_id') required String productId,
-    @Default(false) bool online,
+    /// One of: UNCLAIMED, ONLINE, OFFLINE, DISABLED.
+    @Default('UNCLAIMED') String status,
     @Default([]) List<Capability> capabilities,
   }) = _Device;
+
+  const Device._();
+
+  bool get online => status == 'ONLINE';
 
   factory Device.fromJson(Map<String, dynamic> json) => _$DeviceFromJson(json);
 }

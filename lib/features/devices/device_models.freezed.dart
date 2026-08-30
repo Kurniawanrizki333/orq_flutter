@@ -18,7 +18,7 @@ mixin _$Capability {
 
  String get id; String get key; String get name;/// One of: boolean, number, range, color.
  String get type;/// One of: read, write, read_write.
- String get mode; num? get min; num? get max; String? get unit;
+ String get mode;@JsonKey(name: 'min_value') num? get min;@JsonKey(name: 'max_value') num? get max; String? get unit;
 /// Create a copy of Capability
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -51,7 +51,7 @@ abstract mixin class $CapabilityCopyWith<$Res>  {
   factory $CapabilityCopyWith(Capability value, $Res Function(Capability) _then) = _$CapabilityCopyWithImpl;
 @useResult
 $Res call({
- String id, String key, String name, String type, String mode, num? min, num? max, String? unit
+ String id, String key, String name, String type, String mode,@JsonKey(name: 'min_value') num? min,@JsonKey(name: 'max_value') num? max, String? unit
 });
 
 
@@ -163,7 +163,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String key,  String name,  String type,  String mode,  num? min,  num? max,  String? unit)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String key,  String name,  String type,  String mode, @JsonKey(name: 'min_value')  num? min, @JsonKey(name: 'max_value')  num? max,  String? unit)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Capability() when $default != null:
 return $default(_that.id,_that.key,_that.name,_that.type,_that.mode,_that.min,_that.max,_that.unit);case _:
@@ -184,7 +184,7 @@ return $default(_that.id,_that.key,_that.name,_that.type,_that.mode,_that.min,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String key,  String name,  String type,  String mode,  num? min,  num? max,  String? unit)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String key,  String name,  String type,  String mode, @JsonKey(name: 'min_value')  num? min, @JsonKey(name: 'max_value')  num? max,  String? unit)  $default,) {final _that = this;
 switch (_that) {
 case _Capability():
 return $default(_that.id,_that.key,_that.name,_that.type,_that.mode,_that.min,_that.max,_that.unit);case _:
@@ -204,7 +204,7 @@ return $default(_that.id,_that.key,_that.name,_that.type,_that.mode,_that.min,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String key,  String name,  String type,  String mode,  num? min,  num? max,  String? unit)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String key,  String name,  String type,  String mode, @JsonKey(name: 'min_value')  num? min, @JsonKey(name: 'max_value')  num? max,  String? unit)?  $default,) {final _that = this;
 switch (_that) {
 case _Capability() when $default != null:
 return $default(_that.id,_that.key,_that.name,_that.type,_that.mode,_that.min,_that.max,_that.unit);case _:
@@ -219,7 +219,7 @@ return $default(_that.id,_that.key,_that.name,_that.type,_that.mode,_that.min,_t
 @JsonSerializable()
 
 class _Capability implements Capability {
-  const _Capability({required this.id, required this.key, required this.name, required this.type, required this.mode, this.min, this.max, this.unit});
+  const _Capability({required this.id, required this.key, required this.name, required this.type, required this.mode, @JsonKey(name: 'min_value') this.min, @JsonKey(name: 'max_value') this.max, this.unit});
   factory _Capability.fromJson(Map<String, dynamic> json) => _$CapabilityFromJson(json);
 
 @override final  String id;
@@ -229,8 +229,8 @@ class _Capability implements Capability {
 @override final  String type;
 /// One of: read, write, read_write.
 @override final  String mode;
-@override final  num? min;
-@override final  num? max;
+@override@JsonKey(name: 'min_value') final  num? min;
+@override@JsonKey(name: 'max_value') final  num? max;
 @override final  String? unit;
 
 /// Create a copy of Capability
@@ -266,7 +266,7 @@ abstract mixin class _$CapabilityCopyWith<$Res> implements $CapabilityCopyWith<$
   factory _$CapabilityCopyWith(_Capability value, $Res Function(_Capability) _then) = __$CapabilityCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String key, String name, String type, String mode, num? min, num? max, String? unit
+ String id, String key, String name, String type, String mode,@JsonKey(name: 'min_value') num? min,@JsonKey(name: 'max_value') num? max, String? unit
 });
 
 
@@ -304,7 +304,8 @@ as String?,
 /// @nodoc
 mixin _$Device {
 
- String get id; String get name;@JsonKey(name: 'product_id') String get productId; bool get online; List<Capability> get capabilities;
+ String get id; String get name;@JsonKey(name: 'product_id') String get productId;/// One of: UNCLAIMED, ONLINE, OFFLINE, DISABLED.
+ String get status; List<Capability> get capabilities;
 /// Create a copy of Device
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -317,16 +318,16 @@ $DeviceCopyWith<Device> get copyWith => _$DeviceCopyWithImpl<Device>(this as Dev
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Device&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.productId, productId) || other.productId == productId)&&(identical(other.online, online) || other.online == online)&&const DeepCollectionEquality().equals(other.capabilities, capabilities));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Device&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.productId, productId) || other.productId == productId)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other.capabilities, capabilities));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,productId,online,const DeepCollectionEquality().hash(capabilities));
+int get hashCode => Object.hash(runtimeType,id,name,productId,status,const DeepCollectionEquality().hash(capabilities));
 
 @override
 String toString() {
-  return 'Device(id: $id, name: $name, productId: $productId, online: $online, capabilities: $capabilities)';
+  return 'Device(id: $id, name: $name, productId: $productId, status: $status, capabilities: $capabilities)';
 }
 
 
@@ -337,7 +338,7 @@ abstract mixin class $DeviceCopyWith<$Res>  {
   factory $DeviceCopyWith(Device value, $Res Function(Device) _then) = _$DeviceCopyWithImpl;
 @useResult
 $Res call({
- String id, String name,@JsonKey(name: 'product_id') String productId, bool online, List<Capability> capabilities
+ String id, String name,@JsonKey(name: 'product_id') String productId, String status, List<Capability> capabilities
 });
 
 
@@ -354,13 +355,13 @@ class _$DeviceCopyWithImpl<$Res>
 
 /// Create a copy of Device
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? productId = null,Object? online = null,Object? capabilities = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? productId = null,Object? status = null,Object? capabilities = null,}) {
   return _then(Device(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,productId: null == productId ? _self.productId : productId // ignore: cast_nullable_to_non_nullable
-as String,online: null == online ? _self.online : online // ignore: cast_nullable_to_non_nullable
-as bool,capabilities: null == capabilities ? _self.capabilities : capabilities // ignore: cast_nullable_to_non_nullable
+as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,capabilities: null == capabilities ? _self.capabilities : capabilities // ignore: cast_nullable_to_non_nullable
 as List<Capability>,
   ));
 }
@@ -446,10 +447,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name, @JsonKey(name: 'product_id')  String productId,  bool online,  List<Capability> capabilities)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name, @JsonKey(name: 'product_id')  String productId,  String status,  List<Capability> capabilities)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Device() when $default != null:
-return $default(_that.id,_that.name,_that.productId,_that.online,_that.capabilities);case _:
+return $default(_that.id,_that.name,_that.productId,_that.status,_that.capabilities);case _:
   return orElse();
 
 }
@@ -467,10 +468,10 @@ return $default(_that.id,_that.name,_that.productId,_that.online,_that.capabilit
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name, @JsonKey(name: 'product_id')  String productId,  bool online,  List<Capability> capabilities)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name, @JsonKey(name: 'product_id')  String productId,  String status,  List<Capability> capabilities)  $default,) {final _that = this;
 switch (_that) {
 case _Device():
-return $default(_that.id,_that.name,_that.productId,_that.online,_that.capabilities);case _:
+return $default(_that.id,_that.name,_that.productId,_that.status,_that.capabilities);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -487,10 +488,10 @@ return $default(_that.id,_that.name,_that.productId,_that.online,_that.capabilit
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name, @JsonKey(name: 'product_id')  String productId,  bool online,  List<Capability> capabilities)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name, @JsonKey(name: 'product_id')  String productId,  String status,  List<Capability> capabilities)?  $default,) {final _that = this;
 switch (_that) {
 case _Device() when $default != null:
-return $default(_that.id,_that.name,_that.productId,_that.online,_that.capabilities);case _:
+return $default(_that.id,_that.name,_that.productId,_that.status,_that.capabilities);case _:
   return null;
 
 }
@@ -501,14 +502,15 @@ return $default(_that.id,_that.name,_that.productId,_that.online,_that.capabilit
 /// @nodoc
 @JsonSerializable()
 
-class _Device implements Device {
-  const _Device({required this.id, required this.name, @JsonKey(name: 'product_id') required this.productId, this.online = false,  List<Capability> capabilities = const []}): _capabilities = capabilities;
+class _Device extends Device {
+  const _Device({required this.id, required this.name, @JsonKey(name: 'product_id') required this.productId, this.status = 'UNCLAIMED',  List<Capability> capabilities = const []}): _capabilities = capabilities,super._();
   factory _Device.fromJson(Map<String, dynamic> json) => _$DeviceFromJson(json);
 
 @override final  String id;
 @override final  String name;
 @override@JsonKey(name: 'product_id') final  String productId;
-@override@JsonKey() final  bool online;
+/// One of: UNCLAIMED, ONLINE, OFFLINE, DISABLED.
+@override@JsonKey() final  String status;
  final  List<Capability> _capabilities;
 @override@JsonKey() List<Capability> get capabilities {
   if (_capabilities is EqualUnmodifiableListView) return _capabilities;
@@ -530,16 +532,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Device&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.productId, productId) || other.productId == productId)&&(identical(other.online, online) || other.online == online)&&const DeepCollectionEquality().equals(other._capabilities, _capabilities));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Device&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.productId, productId) || other.productId == productId)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other._capabilities, _capabilities));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,productId,online,const DeepCollectionEquality().hash(_capabilities));
+int get hashCode => Object.hash(runtimeType,id,name,productId,status,const DeepCollectionEquality().hash(_capabilities));
 
 @override
 String toString() {
-  return 'Device(id: $id, name: $name, productId: $productId, online: $online, capabilities: $capabilities)';
+  return 'Device(id: $id, name: $name, productId: $productId, status: $status, capabilities: $capabilities)';
 }
 
 
@@ -550,7 +552,7 @@ abstract mixin class _$DeviceCopyWith<$Res> implements $DeviceCopyWith<$Res> {
   factory _$DeviceCopyWith(_Device value, $Res Function(_Device) _then) = __$DeviceCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name,@JsonKey(name: 'product_id') String productId, bool online, List<Capability> capabilities
+ String id, String name,@JsonKey(name: 'product_id') String productId, String status, List<Capability> capabilities
 });
 
 
@@ -567,13 +569,13 @@ class __$DeviceCopyWithImpl<$Res>
 
 /// Create a copy of Device
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? productId = null,Object? online = null,Object? capabilities = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? productId = null,Object? status = null,Object? capabilities = null,}) {
   return _then(_Device(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,productId: null == productId ? _self.productId : productId // ignore: cast_nullable_to_non_nullable
-as String,online: null == online ? _self.online : online // ignore: cast_nullable_to_non_nullable
-as bool,capabilities: null == capabilities ? _self._capabilities : capabilities // ignore: cast_nullable_to_non_nullable
+as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,capabilities: null == capabilities ? _self._capabilities : capabilities // ignore: cast_nullable_to_non_nullable
 as List<Capability>,
   ));
 }
