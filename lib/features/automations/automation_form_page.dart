@@ -20,6 +20,10 @@ class _AutomationFormPageState extends ConsumerState<AutomationFormPage> {
   final _manualDeviceId = TextEditingController();
   final _manualCapability = TextEditingController();
   final _manualValue = TextEditingController();
+  final _triggerDeviceId = TextEditingController();
+  final _triggerCapability = TextEditingController();
+  final _triggerValue = TextEditingController();
+  String _triggerOperator = '>';
 
   AutomationDraft? _draft;
   bool _busy = false;
@@ -32,6 +36,9 @@ class _AutomationFormPageState extends ConsumerState<AutomationFormPage> {
     _manualDeviceId.dispose();
     _manualCapability.dispose();
     _manualValue.dispose();
+    _triggerDeviceId.dispose();
+    _triggerCapability.dispose();
+    _triggerValue.dispose();
     super.dispose();
   }
 
@@ -57,10 +64,21 @@ class _AutomationFormPageState extends ConsumerState<AutomationFormPage> {
     await _save(name: draft.summary, actions: draft.actions, trigger: draft.trigger);
   }
 
+  /// The backend types values per capability (bool / number / "#RRGGBB"), so a
+  /// raw text field would be rejected for anything but a color.
+  static dynamic _coerce(String raw) {
+    final t = raw.trim();
+    if (t == 'true') return true;
+    if (t == 'false') return false;
+    return num.tryParse(t) ?? t;
+  }
+
   Future<void> _saveManual() async {
     if (_manualName.text.trim().isEmpty ||
         _manualDeviceId.text.trim().isEmpty ||
-        _manualCapability.text.trim().isEmpty) {
+        _manualCapability.text.trim().isEmpty ||
+        _triggerDeviceId.text.trim().isEmpty ||
+        _triggerCapability.text.trim().isEmpty) {
       return;
     }
     await _save(
@@ -69,10 +87,15 @@ class _AutomationFormPageState extends ConsumerState<AutomationFormPage> {
         AutomationAction(
           deviceId: _manualDeviceId.text.trim(),
           capability: _manualCapability.text.trim(),
-          value: _manualValue.text.trim(),
+          value: _coerce(_manualValue.text),
         ),
       ],
-      trigger: null,
+      trigger: {
+        'device_id': _triggerDeviceId.text.trim(),
+        'capability': _triggerCapability.text.trim(),
+        'operator': _triggerOperator,
+        'value': _coerce(_triggerValue.text),
+      },
     );
   }
 
@@ -139,12 +162,40 @@ class _AutomationFormPageState extends ConsumerState<AutomationFormPage> {
           Text('Or build one manually', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           TextField(controller: _manualName, decoration: const InputDecoration(labelText: 'Name')),
+          const SizedBox(height: 16),
+          Text('When', style: Theme.of(context).textTheme.labelLarge),
           const SizedBox(height: 8),
-          TextField(controller: _manualDeviceId, decoration: const InputDecoration(labelText: 'Device ID')),
+          TextField(controller: _triggerDeviceId, decoration: const InputDecoration(labelText: 'Trigger device ID')),
           const SizedBox(height: 8),
-          TextField(controller: _manualCapability, decoration: const InputDecoration(labelText: 'Capability key')),
+          TextField(
+            controller: _triggerCapability,
+            decoration: const InputDecoration(labelText: 'Trigger capability key'),
+          ),
           const SizedBox(height: 8),
-          TextField(controller: _manualValue, decoration: const InputDecoration(labelText: 'Value')),
+          DropdownButtonFormField<String>(
+            initialValue: _triggerOperator,
+            decoration: const InputDecoration(labelText: 'Operator'),
+            items: const [
+              DropdownMenuItem(value: '>', child: Text('greater than')),
+              DropdownMenuItem(value: '<', child: Text('less than')),
+              DropdownMenuItem(value: '=', child: Text('equals')),
+              DropdownMenuItem(value: 'changes_to', child: Text('changes to')),
+            ],
+            onChanged: (v) => setState(() => _triggerOperator = v ?? '>'),
+          ),
+          const SizedBox(height: 8),
+          TextField(controller: _triggerValue, decoration: const InputDecoration(labelText: 'Trigger value')),
+          const SizedBox(height: 16),
+          Text('Then', style: Theme.of(context).textTheme.labelLarge),
+          const SizedBox(height: 8),
+          TextField(controller: _manualDeviceId, decoration: const InputDecoration(labelText: 'Action device ID')),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _manualCapability,
+            decoration: const InputDecoration(labelText: 'Action capability key'),
+          ),
+          const SizedBox(height: 8),
+          TextField(controller: _manualValue, decoration: const InputDecoration(labelText: 'Action value')),
           const SizedBox(height: 8),
           OutlinedButton(onPressed: _busy ? null : _saveManual, child: const Text('Save manual rule')),
           if (_error != null) Padding(padding: const EdgeInsets.only(top: 16), child: Text(_error!)),

@@ -22,6 +22,14 @@ class ApiClient {
           }
           handler.next(options);
         },
+        onResponse: (response, handler) {
+          // Backend wraps every success in {data, message, meta?}. Unwrap here
+          // so repositories read the payload directly instead of each one
+          // reaching through the envelope.
+          final body = response.data;
+          if (body is Map && body.containsKey('data')) response.data = body['data'];
+          handler.next(response);
+        },
         onError: (error, handler) async {
           final isUnauthorized = error.response?.statusCode == 401;
           final alreadyRetried = error.requestOptions.extra['retried'] == true;
