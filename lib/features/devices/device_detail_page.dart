@@ -17,7 +17,7 @@ class DeviceDetailPage extends ConsumerWidget {
   final String deviceId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final devices = ref.watch(myDevicesProvider);
     return Scaffold(
       appBar: AppBar(title: const Text('Device detail')),
