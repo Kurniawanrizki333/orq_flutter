@@ -17,7 +17,7 @@ class DeviceDetailPage extends ConsumerWidget {
   final String deviceId;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final devices = ref.watch(myDevicesProvider);
     return Scaffold(
       appBar: AppBar(title: const Text('Device detail')),
@@ -100,7 +100,7 @@ class _DeviceDetailState extends ConsumerState<_DeviceDetail> {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final device = widget.device;
     final values = ref.watch(deviceStateProvider(device.id));
     final controller = ref.read(deviceStateProvider(device.id).notifier);
