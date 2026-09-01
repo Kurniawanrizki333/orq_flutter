@@ -242,6 +242,11 @@ class _FakeDeviceRepository implements DeviceRepository {
   Future<List<Device>> myDevices() => _devices();
 
   @override
+  Future<void> unclaim(String deviceId) {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<Device> claim({
     required String deviceCode,
     required String pairingToken,

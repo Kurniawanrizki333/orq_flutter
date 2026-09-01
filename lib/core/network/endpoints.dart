@@ -24,6 +24,7 @@ class Endpoints {
   static const claimDevice = '/iot/v1/devices/claim';
   static const claimPreview = '/iot/v1/devices/claim/preview';
   static const myDevices = '/iot/v1/me/devices';
+  static String deviceClaim(String id) => '/iot/v1/devices/$id/claim';
   static String deviceState(String id) => '/iot/v1/devices/$id/state';
   static String deviceCommands(String id) => '/iot/v1/devices/$id/commands';
   static const automations = '/iot/v1/automations';

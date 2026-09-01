@@ -46,6 +46,47 @@ void main() {
       command.complete();
     },
   );
+
+  testWidgets(
+    'removing a device confirms consequences and prevents duplicates',
+    (tester) async {
+      final removal = Completer<void>();
+      final events = StreamController<DeviceEvent>.broadcast();
+      final repository = _FakeDeviceRepository(
+        Future.value(),
+        unclaim: (_) => removal.future,
+      );
+      final container = ProviderContainer(
+        overrides: [
+          activeUserIdProvider.overrideWithValue('user-1'),
+          deviceRepositoryProvider.overrideWithValue(repository),
+          deviceEventsProvider.overrideWithValue(events.stream),
+        ],
+      );
+      addTearDown(() async {
+        container.dispose();
+        await events.close();
+      });
+
+      await tester.pumpWidget(_app(container));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Remove device'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('deletes automations'), findsOneWidget);
+      expect(
+        find.textContaining('administrator must generate a new pairing QR'),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.text('Remove device').last);
+      await tester.pump();
+      expect(find.text('Removing device...'), findsOneWidget);
+      expect(
+        tester.widget<FilledButton>(find.byType(FilledButton).last).onPressed,
+        isNull,
+      );
+    },
+  );
 }
 
 Widget _app(ProviderContainer container) {
@@ -56,9 +97,11 @@ Widget _app(ProviderContainer container) {
 }
 
 class _FakeDeviceRepository implements DeviceRepository {
-  _FakeDeviceRepository(this.command);
+  _FakeDeviceRepository(this.command, {Future<void> Function(String)? unclaim})
+    : _unclaim = unclaim ?? ((_) async {});
 
   final Future<void> command;
+  final Future<void> Function(String) _unclaim;
 
   @override
   Future<List<Device>> myDevices() async => const [
@@ -88,6 +131,11 @@ class _FakeDeviceRepository implements DeviceRepository {
     required String capability,
     required dynamic value,
   }) => command;
+
+  @override
+  Future<void> unclaim(String deviceId) {
+    return _unclaim(deviceId);
+  }
 
   @override
   Future<Device> claim({

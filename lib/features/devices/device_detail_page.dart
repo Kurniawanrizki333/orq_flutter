@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/widgets/app_state_view.dart';
 import '../../core/widgets/responsive_page.dart';
 import '../../core/widgets/section_card.dart';
 import '../../core/widgets/status_badge.dart';
+import '../automations/automation_providers.dart';
 import 'capability_control.dart';
 import 'device_models.dart';
 import 'device_providers.dart';
@@ -42,13 +44,64 @@ class DeviceDetailPage extends ConsumerWidget {
   }
 }
 
-class _DeviceDetail extends ConsumerWidget {
+class _DeviceDetail extends ConsumerStatefulWidget {
   const _DeviceDetail({required this.device});
 
   final Device device;
 
   @override
+  ConsumerState<_DeviceDetail> createState() => _DeviceDetailState();
+}
+
+class _DeviceDetailState extends ConsumerState<_DeviceDetail> {
+  bool _unclaiming = false;
+
+  Future<void> _unclaim() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove device?'),
+        content: const Text(
+          'This removes the device from your account and deletes automations that reference it. To pair it again, an administrator must generate a new pairing QR code.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
+            ),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Remove device'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _unclaiming = true);
+    try {
+      await ref.read(deviceRepositoryProvider).unclaim(widget.device.id);
+      ref.invalidate(myDevicesProvider);
+      ref.invalidate(automationsProvider);
+      if (mounted) context.go('/');
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not remove device: $error')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _unclaiming = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final device = widget.device;
     final values = ref.watch(deviceStateProvider(device.id));
     final controller = ref.read(deviceStateProvider(device.id).notifier);
     return values.when(
@@ -109,6 +162,23 @@ class _DeviceDetail extends ConsumerWidget {
                       ],
                     ),
                   ),
+                const SizedBox(height: 16),
+                SectionCard(
+                  title: 'Danger zone',
+                  child: FilledButton.tonalIcon(
+                    onPressed: _unclaiming ? null : _unclaim,
+                    icon: _unclaiming
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.link_off),
+                    label: Text(
+                      _unclaiming ? 'Removing device...' : 'Remove device',
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

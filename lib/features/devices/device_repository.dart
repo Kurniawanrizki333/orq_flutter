@@ -30,6 +30,10 @@ class DeviceRepository {
     );
   }
 
+  Future<void> unclaim(String deviceId) {
+    return _client.dio.delete(Endpoints.deviceClaim(deviceId));
+  }
+
   Future<Device> claim({
     required String deviceCode,
     required String pairingToken,
