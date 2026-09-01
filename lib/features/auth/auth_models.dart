@@ -12,7 +12,8 @@ abstract class AuthUser with _$AuthUser {
     @JsonKey(name: 'full_name') String? fullName,
   }) = _AuthUser;
 
-  factory AuthUser.fromJson(Map<String, dynamic> json) => _$AuthUserFromJson(json);
+  factory AuthUser.fromJson(Map<String, dynamic> json) =>
+      _$AuthUserFromJson(json);
 }
 
 @freezed
@@ -23,5 +24,6 @@ abstract class AuthResult with _$AuthResult {
     required AuthUser user,
   }) = _AuthResult;
 
-  factory AuthResult.fromJson(Map<String, dynamic> json) => _$AuthResultFromJson(json);
+  factory AuthResult.fromJson(Map<String, dynamic> json) =>
+      _$AuthResultFromJson(json);
 }

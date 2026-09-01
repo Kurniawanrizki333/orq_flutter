@@ -8,15 +8,31 @@ class AuthRepository {
   final ApiClient _client;
 
   Future<AuthUser?> restoreSession() async {
-    final token = await _client.tokenStorage.accessToken;
-    if (token == null) return null;
-    // ponytail: no /me endpoint wired yet, so a stored token is trusted as-is;
-    // add a profile fetch here once /iot/v1 (or /core/v1/auth/me) is confirmed live.
-    return null;
+    if (await _client.tokenStorage.accessToken == null) {
+      if (await _client.tokenStorage.refreshToken == null ||
+          !await _client.refreshSession()) {
+        return null;
+      }
+    }
+    try {
+      final res = await _client.dio.get(Endpoints.me);
+      final data = res.data as Map<String, dynamic>;
+      return AuthUser.fromJson(data['user'] as Map<String, dynamic>);
+    } catch (_) {
+      // The interceptor refreshes 401s and clears only an expired session.
+      if (await _client.tokenStorage.accessToken == null) return null;
+      rethrow;
+    }
   }
 
-  Future<AuthUser> signIn({required String login, required String password}) async {
-    final res = await _client.dio.post(Endpoints.signIn, data: {'login': login, 'password': password});
+  Future<AuthUser> signIn({
+    required String login,
+    required String password,
+  }) async {
+    final res = await _client.dio.post(
+      Endpoints.signIn,
+      data: {'login': login, 'password': password},
+    );
     final data = res.data as Map<String, dynamic>;
     await _client.tokenStorage.save(
       accessToken: data['access_token'] as String,
@@ -25,9 +41,6 @@ class AuthRepository {
     return AuthUser.fromJson(data['user'] as Map<String, dynamic>);
   }
 
-  // ponytail: assumes consumer-signup auto-signs-in like /core/v1/auth/signin
-  // (access_token/refresh_token/user in the body). Backend not built yet —
-  // adjust parsing once /iot/v1/auth/consumer-signup ships for real.
   Future<AuthUser> signUp({
     required String email,
     required String username,
@@ -36,7 +49,12 @@ class AuthRepository {
   }) async {
     final res = await _client.dio.post(
       Endpoints.consumerSignUp,
-      data: {'email': email, 'username': username, 'password': password, 'full_name': ?fullName},
+      data: {
+        'email': email,
+        'username': username,
+        'password': password,
+        'full_name': ?fullName,
+      },
     );
     final data = res.data as Map<String, dynamic>;
     await _client.tokenStorage.save(

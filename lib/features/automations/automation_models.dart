@@ -11,7 +11,8 @@ abstract class AutomationAction with _$AutomationAction {
     required dynamic value,
   }) = _AutomationAction;
 
-  factory AutomationAction.fromJson(Map<String, dynamic> json) => _$AutomationActionFromJson(json);
+  factory AutomationAction.fromJson(Map<String, dynamic> json) =>
+      _$AutomationActionFromJson(json);
 }
 
 @freezed
@@ -21,12 +22,13 @@ abstract class Automation with _$Automation {
     required String name,
     @Default(true) bool enabled,
     @Default([]) List<AutomationAction> actions,
-    // ponytail: trigger shape unconfirmed (backend not built) — kept as a raw
-    // map so the UI doesn't need a rewrite once /iot/v1/automations lands.
+
+    /// Public trigger contract: device or schedule scalar payload.
     Map<String, dynamic>? trigger,
   }) = _Automation;
 
-  factory Automation.fromJson(Map<String, dynamic> json) => _$AutomationFromJson(json);
+  factory Automation.fromJson(Map<String, dynamic> json) =>
+      _$AutomationFromJson(json);
 }
 
 /// AI-generated preview — not persisted until the user confirms.
@@ -38,5 +40,6 @@ abstract class AutomationDraft with _$AutomationDraft {
     Map<String, dynamic>? trigger,
   }) = _AutomationDraft;
 
-  factory AutomationDraft.fromJson(Map<String, dynamic> json) => _$AutomationDraftFromJson(json);
+  factory AutomationDraft.fromJson(Map<String, dynamic> json) =>
+      _$AutomationDraftFromJson(json);
 }

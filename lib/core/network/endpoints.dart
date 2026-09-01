@@ -1,8 +1,9 @@
 /// API base URL. Override at build/run time:
-/// `flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8080`
+/// Android emulator: `http://10.0.2.2:8090`.
+/// Physical device: use the development machine's current LAN IP.
 const apiBaseUrl = String.fromEnvironment(
   'API_BASE_URL',
-  defaultValue: 'http://localhost:8080',
+  defaultValue: 'http://localhost:8090',
 );
 
 /// WS base URL derived from [apiBaseUrl] unless overridden.
@@ -13,17 +14,20 @@ final wsBaseUrl = const String.fromEnvironment('WS_BASE_URL').isNotEmpty
 class Endpoints {
   const Endpoints._();
 
-  // core/v1 — shared with the admin FE, consumer only uses signin/refresh.
+  // core/v1 — shared authentication surface.
   static const signIn = '/core/v1/auth/signin';
   static const refresh = '/core/v1/auth/refresh';
+  static const me = '/core/v1/auth/me';
 
   // iot/v1 — consumer-only surface (PRD Phase 1c).
   static const consumerSignUp = '/iot/v1/auth/consumer-signup';
   static const claimDevice = '/iot/v1/devices/claim';
+  static const claimPreview = '/iot/v1/devices/claim/preview';
   static const myDevices = '/iot/v1/me/devices';
   static String deviceState(String id) => '/iot/v1/devices/$id/state';
   static String deviceCommands(String id) => '/iot/v1/devices/$id/commands';
   static const automations = '/iot/v1/automations';
   static const automationGenerate = '/iot/v1/automations/generate';
+  static String automation(String id) => '/iot/v1/automations/$id';
   static String ws(String token) => '$wsBaseUrl/iot/v1/ws?token=$token';
 }

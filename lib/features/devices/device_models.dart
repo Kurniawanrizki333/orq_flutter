@@ -13,8 +13,10 @@ abstract class Capability with _$Capability {
     required String id,
     required String key,
     required String name,
+
     /// One of: boolean, number, range, color.
     required String type,
+
     /// One of: read, write, read_write.
     required String mode,
     @JsonKey(name: 'min_value') num? min,
@@ -22,7 +24,8 @@ abstract class Capability with _$Capability {
     String? unit,
   }) = _Capability;
 
-  factory Capability.fromJson(Map<String, dynamic> json) => _$CapabilityFromJson(json);
+  factory Capability.fromJson(Map<String, dynamic> json) =>
+      _$CapabilityFromJson(json);
 }
 
 @freezed
@@ -31,6 +34,7 @@ abstract class Device with _$Device {
     required String id,
     required String name,
     @JsonKey(name: 'product_id') required String productId,
+
     /// One of: UNCLAIMED, ONLINE, OFFLINE, DISABLED.
     @Default('UNCLAIMED') String status,
     @Default([]) List<Capability> capabilities,
@@ -40,5 +44,12 @@ abstract class Device with _$Device {
 
   bool get online => status == 'ONLINE';
 
-  factory Device.fromJson(Map<String, dynamic> json) => _$DeviceFromJson(json);
+  factory Device.fromJson(Map<String, dynamic> json) {
+    final product = json['product'];
+    return _$DeviceFromJson({
+      ...json,
+      if (json['product_id'] == null && product is Map)
+        'product_id': product['id'],
+    });
+  }
 }

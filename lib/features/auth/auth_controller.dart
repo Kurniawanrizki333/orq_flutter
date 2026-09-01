@@ -8,7 +8,8 @@ import 'auth_repository.dart';
 final apiClientProvider = Provider<ApiClient>((ref) {
   return ApiClient(
     tokenStorage: const TokenStorage(),
-    onUnauthorized: () => ref.read(authControllerProvider.notifier).forceSignOut(),
+    onUnauthorized: () =>
+        ref.read(authControllerProvider.notifier).forceSignOut(),
   );
 });
 
@@ -16,7 +17,13 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository(ref.read(apiClientProvider));
 });
 
-final authControllerProvider = AsyncNotifierProvider<AuthController, AuthUser?>(AuthController.new);
+final authControllerProvider = AsyncNotifierProvider<AuthController, AuthUser?>(
+  AuthController.new,
+);
+
+final activeUserIdProvider = Provider<String?>((ref) {
+  return ref.watch(authControllerProvider).value?.id;
+});
 
 class AuthController extends AsyncNotifier<AuthUser?> {
   AuthRepository get _repo => ref.read(authRepositoryProvider);
@@ -26,13 +33,25 @@ class AuthController extends AsyncNotifier<AuthUser?> {
 
   Future<void> signIn({required String login, required String password}) async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() => _repo.signIn(login: login, password: password));
+    state = await AsyncValue.guard(
+      () => _repo.signIn(login: login, password: password),
+    );
   }
 
-  Future<void> signUp({required String email, required String username, required String password, String? fullName}) async {
+  Future<void> signUp({
+    required String email,
+    required String username,
+    required String password,
+    String? fullName,
+  }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(
-      () => _repo.signUp(email: email, username: username, password: password, fullName: fullName),
+      () => _repo.signUp(
+        email: email,
+        username: username,
+        password: password,
+        fullName: fullName,
+      ),
     );
   }
 
