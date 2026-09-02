@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/widgets/section_card.dart';
 import 'auth_controller.dart';
+import 'google_auth.dart';
 
 class SignUpPage extends ConsumerStatefulWidget {
   const SignUpPage({super.key});
@@ -42,6 +43,9 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
               : _fullName.text.trim(),
         );
   }
+
+  void _signInWithGoogle() =>
+      ref.read(authControllerProvider.notifier).signInWithGoogle();
 
   @override
   Widget build(BuildContext context) {
@@ -163,6 +167,18 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                                   ),
                                 )
                               : const Text('Create account'),
+                        ),
+                        const SizedBox(height: 12),
+                        OutlinedButton.icon(
+                          onPressed: isLoading || !GoogleAuth.isConfigured
+                              ? null
+                              : _signInWithGoogle,
+                          icon: const Icon(Icons.g_mobiledata),
+                          label: Text(
+                            GoogleAuth.isConfigured
+                                ? 'Sign up with Google'
+                                : 'Google sign-up unavailable',
+                          ),
                         ),
                         TextButton(
                           onPressed: () => context.pop(),

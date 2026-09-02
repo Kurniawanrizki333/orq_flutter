@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class AdaptiveScaffold extends StatelessWidget {
+import '../theme/theme_mode_controller.dart';
+
+class AdaptiveScaffold extends ConsumerWidget {
   const AdaptiveScaffold({
     super.key,
     required this.title,
@@ -18,7 +21,7 @@ class AdaptiveScaffold extends StatelessWidget {
   final Widget? floatingActionButton;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final useRail = MediaQuery.sizeOf(context).width >= 720;
     final scaffold = Scaffold(
       appBar: AppBar(
@@ -29,7 +32,10 @@ class AdaptiveScaffold extends StatelessWidget {
             Flexible(child: Text(title)),
           ],
         ),
-        actions: actions,
+        actions: [
+          ...actions,
+          _ThemeModeMenu(ref: ref),
+        ],
       ),
       floatingActionButton: floatingActionButton,
       bottomNavigationBar: useRail
@@ -85,4 +91,58 @@ class AdaptiveScaffold extends StatelessWidget {
     if (index == selectedIndex) return;
     context.go(index == 0 ? '/' : '/automations');
   }
+}
+
+class _ThemeModeMenu extends StatelessWidget {
+  const _ThemeModeMenu({required this.ref});
+
+  final WidgetRef ref;
+
+  @override
+  Widget build(BuildContext context) {
+    final mode = ref
+        .watch(themeModeControllerProvider)
+        .when(
+          data: (mode) => mode,
+          loading: () => ThemeMode.system,
+          error: (_, _) => ThemeMode.system,
+        );
+    return PopupMenuButton<ThemeMode>(
+      tooltip: 'Theme',
+      icon: Icon(_iconFor(mode)),
+      onSelected: (selectedMode) {
+        ref.read(themeModeControllerProvider.notifier).setMode(selectedMode);
+      },
+      itemBuilder: (context) => [
+        _item(ThemeMode.light, mode, 'Light', Icons.light_mode_outlined),
+        _item(ThemeMode.dark, mode, 'Dark', Icons.dark_mode_outlined),
+        _item(ThemeMode.system, mode, 'System', Icons.brightness_auto_outlined),
+      ],
+    );
+  }
+
+  PopupMenuItem<ThemeMode> _item(
+    ThemeMode value,
+    ThemeMode activeMode,
+    String label,
+    IconData icon,
+  ) {
+    return PopupMenuItem(
+      value: value,
+      child: Row(
+        children: [
+          Icon(icon),
+          const SizedBox(width: 12),
+          Expanded(child: Text(label)),
+          if (value == activeMode) const Icon(Icons.check),
+        ],
+      ),
+    );
+  }
+
+  IconData _iconFor(ThemeMode mode) => switch (mode) {
+    ThemeMode.light => Icons.light_mode_outlined,
+    ThemeMode.dark => Icons.dark_mode_outlined,
+    ThemeMode.system => Icons.brightness_auto_outlined,
+  };
 }

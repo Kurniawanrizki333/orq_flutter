@@ -82,7 +82,14 @@ void main() {
       await tester.pump();
       expect(find.text('Removing device...'), findsOneWidget);
       expect(
-        tester.widget<FilledButton>(find.byType(FilledButton).last).onPressed,
+        tester
+            .widget<FilledButton>(
+              find.ancestor(
+                of: find.text('Removing device...'),
+                matching: find.byType(FilledButton),
+              ),
+            )
+            .onPressed,
         isNull,
       );
     },

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "766947616078",
+    "project_id": "orqestra-a4514",
+    "storage_bucket": "orqestra-a4514.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:766947616078:android:8cce73f0dace92740a6a1f",
+        "android_client_info": {
+          "package_name": "com.venturo.orqestra"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "766947616078-cmmq1jugjlk4von7v0r6iunfvhbnnq0g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABvTrNB_dJ5idW3wvHvgH0uPPMT0dWTKo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "766947616078-cmmq1jugjlk4von7v0r6iunfvhbnnq0g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

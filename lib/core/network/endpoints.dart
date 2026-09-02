@@ -16,6 +16,7 @@ class Endpoints {
 
   // core/v1 — shared authentication surface.
   static const signIn = '/core/v1/auth/signin';
+  static const googleSignIn = '/core/v1/auth/google';
   static const refresh = '/core/v1/auth/refresh';
   static const me = '/core/v1/auth/me';
 

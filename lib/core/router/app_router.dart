@@ -21,8 +21,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: '/',
     redirect: (context, state) {
       final startup = state.matchedLocation == '/startup';
-      if ((resolving || auth.hasError) && !startup) return '/startup';
-      if (startup && (resolving || auth.hasError)) return null;
+      if (resolving && !startup) return '/startup';
+      if (startup && resolving) return null;
       final onAuthPages =
           state.matchedLocation == '/sign-in' ||
           state.matchedLocation == '/sign-up';

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/widgets/section_card.dart';
 import 'auth_controller.dart';
+import 'google_auth.dart';
 
 class SignInPage extends ConsumerStatefulWidget {
   const SignInPage({super.key});
@@ -32,6 +33,9 @@ class _SignInPageState extends ConsumerState<SignInPage> {
         .signIn(login: _login.text.trim(), password: _password.text);
   }
 
+  void _signInWithGoogle() =>
+      ref.read(authControllerProvider.notifier).signInWithGoogle();
+
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authControllerProvider);
@@ -57,6 +61,7 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                     onTogglePassword: () =>
                         setState(() => _obscurePassword = !_obscurePassword),
                     onSubmit: _submit,
+                    onGoogleSignIn: _signInWithGoogle,
                   );
                   if (!wide) return form;
                   return Row(
@@ -122,6 +127,7 @@ class _SignInForm extends StatelessWidget {
     required this.isLoading,
     required this.onTogglePassword,
     required this.onSubmit,
+    required this.onGoogleSignIn,
     this.error,
   });
 
@@ -132,6 +138,7 @@ class _SignInForm extends StatelessWidget {
   final bool isLoading;
   final VoidCallback onTogglePassword;
   final VoidCallback onSubmit;
+  final VoidCallback onGoogleSignIn;
   final String? error;
 
   @override
@@ -206,6 +213,18 @@ class _SignInForm extends StatelessWidget {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Text('Sign in'),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: isLoading || !GoogleAuth.isConfigured
+                    ? null
+                    : onGoogleSignIn,
+                icon: const Icon(Icons.g_mobiledata),
+                label: Text(
+                  GoogleAuth.isConfigured
+                      ? 'Continue with Google'
+                      : 'Google sign-in unavailable',
+                ),
               ),
               TextButton(
                 onPressed: () => context.push('/sign-up'),

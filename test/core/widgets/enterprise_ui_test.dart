@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:orqestra_flutter/core/theme/app_theme.dart';
 import 'package:orqestra_flutter/core/widgets/adaptive_scaffold.dart';
@@ -43,11 +44,13 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(
-      const MaterialApp(
-        home: AdaptiveScaffold(
-          title: 'Devices',
-          selectedIndex: 0,
-          body: SizedBox(),
+      const ProviderScope(
+        child: MaterialApp(
+          home: AdaptiveScaffold(
+            title: 'Devices',
+            selectedIndex: 0,
+            body: SizedBox(),
+          ),
         ),
       ),
     );
@@ -63,11 +66,13 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(
-      const MaterialApp(
-        home: AdaptiveScaffold(
-          title: 'Devices',
-          selectedIndex: 0,
-          body: SizedBox(),
+      const ProviderScope(
+        child: MaterialApp(
+          home: AdaptiveScaffold(
+            title: 'Devices',
+            selectedIndex: 0,
+            body: SizedBox(),
+          ),
         ),
       ),
     );
